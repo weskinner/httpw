@@ -18,21 +18,30 @@
 void handle_request(int client_fd, char *msg) {
     int header_len, body_len, fd;
     char body_buf[BUFFER_SIZE], header_buf[512];
-    char *path_begin, *path_end;
-    int path_len;
+    char *req_path_begin, *req_path_end;
+    int req_path_len;
     char full_path[256], relative_path[128];
 
+    /* clear the full path buffer */
     memset(full_path, 0, sizeof(full_path));
+    /* clear the relative path buffer */
     memset(relative_path, 0, sizeof(relative_path));
+    /* copy doc root string into full path buffer */
     strcpy(full_path, DOC_ROOT);
-    path_begin = strchr(msg, '/');
-    path_end = strchr(path_begin, ' ');
-    path_len = (path_end - path_begin);
-    if(path_len > 1) {
-        strncpy(relative_path, path_begin, path_len);
+    /* find the beginning of the request path in the request message */
+    req_path_begin = strchr(msg, '/');
+    /* find the end of the request path */
+    req_path_end = strchr(req_path_begin, ' ');
+    /* determine length of the request path */
+    req_path_len = (req_path_end - req_path_begin);
+    if(req_path_len > 1) {
+        /* copy the request path into the relative path buffer */
+        strncpy(relative_path, req_path_begin, req_path_len);
     } else {
+        /* if '/' request path serve up index */
         strcpy(relative_path, "/index.html");
     }
+    /* concatenate the relative path to the full path */
     strcat(full_path, relative_path);
     /* open the index.html file */
     fd = open(full_path, O_RDONLY);
