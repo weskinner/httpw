@@ -59,7 +59,10 @@ void handle_request(int client_fd, char *msg) {
         /* write the body to the client */
         write(client_fd, body_buf, body_len);
     } else {
+        /* we couldn't open the file at full_path */
+        /* write the 404 header to header_buf*/
         header_len = sprintf(header_buf, HEADER_NOT_FOUND);
+        /* write header_buf to the client socket */
         write(client_fd, header_buf, header_len);
     }
 }
@@ -142,6 +145,8 @@ int main(int argc, char *argv[])
                         /* print the client's message */
                         printf("Client Message:\n%s\n\n",buf);
                         handle_request(i, buf);
+                        /* End the request */
+                        /* TODO: determine alternative to this */
                         close(i);
                     }
                 }
